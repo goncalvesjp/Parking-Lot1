@@ -38,7 +38,7 @@ class OutputClue(input: String, val output: String, isPrivate: Boolean, hint: St
 
         myLines.zip(hisLines).withIndex().forEach { (i, pair) ->
             val (my, his) = pair
-            if (my.toLowerCase() != his.toLowerCase()) {
+            if (my.lowercase() != his.lowercase()) {
                 return toFailure("Error in line ${i + 1}: \"$his\" instead of \"$my\".")
             }
         }

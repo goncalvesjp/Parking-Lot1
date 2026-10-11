@@ -1,15 +1,14 @@
 package parking
 
 import java.util.*
-import kotlin.system.exitProcess
 
 fun main() {
 
     val carParking: CarParking = CarParking()
 
-    while (true) {
-        val scanner = Scanner(System.`in`)
+    val scanner = Scanner(System.`in`)
 
+    while (true) {
         val input = scanner.nextLine()
         val inputList = input.split(" ")
 
@@ -32,7 +31,7 @@ fun main() {
             }
 
             1 -> when (inputList[0].trim()) {
-                "exit" -> exitProcess(0)
+                "exit" -> return
                 "status" -> carParking.status()
             }
         }
@@ -42,70 +41,53 @@ fun main() {
 
 class CarParking() {
     var activated: Boolean = false
-    var level: Int = 0
     var spots = List<Car?>(0) { null }.toMutableList()
 
     fun createOrReset(parkSize: Int) {
         activated = true
-        level = 0
         spots = List<Car?>(parkSize) { null }.toMutableList()
         println("Created a parking lot with $parkSize spots.")
     }
 
 
     fun park(car: Car) {
-        if (activated && level < spots.size) {
-            var id = 0
-            val iterator = spots.iterator()
-            do {
-                val spot = iterator.next()
-                if (spot == null) {
-                    spots[id] = car
-                    level = id
-                    println("${car.carColor} car parked in spot ${id + 1}.")
-                    return
-                } else {
-                    id++
-                }
-            } while (iterator.hasNext() && id < spots.size)
-
+        if (!activated) {
+            println("Sorry, a parking lot has not been created.")
+            return
+        }
+        val id = spots.indexOfFirst { it == null }
+        if (id == -1) {
             println("Sorry, the parking lot is full.")
         } else {
-            println("Sorry, a parking lot has not been created.")
+            spots[id] = car
+            println("${car.carColor} car parked in spot ${id + 1}.")
         }
     }
 
 
     fun leave(idSpot: Int) {
-        if (activated && level > idSpot - 1) {
-            if (spots[idSpot - 1] != null) {
-                spots[idSpot - 1] = null
-                println("Spot $idSpot is free.")
-            } else {
-                println("There is no car in spot 1.")
-            }
-        } else {
+        if (!activated) {
             println("Sorry, a parking lot has not been created.")
+        } else if (idSpot !in 1..spots.size || spots[idSpot - 1] == null) {
+            println("There is no car in spot $idSpot.")
+        } else {
+            spots[idSpot - 1] = null
+            println("Spot $idSpot is free.")
         }
     }
 
 
     fun status() {
-        if (activated) {
-            if (level >= 0) {
-                var id = 0
-                for (spot in spots) {
-                    id++
-                    if (spot != null) {
-                        println("$id ${spot.registrationNumber} ${spot.carColor}")
-                    }
-                }
-            } else {
-                println("Parking lot is empty.")
-            }
-
-        } else {
+        if (!activated) {
             println("Sorry, a parking lot has not been created.")
+        } else if (spots.all { it == null }) {
+            println("Parking lot is empty.")
+        } else {
+            for ((i, spot) in spots.withIndex()) {
+                if (spot != null) {
+                    println("${i + 1} ${spot.registrationNumber} ${spot.carColor}")
+                }
+            }
         }
     }
 
@@ -120,7 +102,7 @@ class CarParking() {
             if (myList.isNotEmpty()) {
                 println(myList.joinToString(prefix = "", postfix = "", separator = ", "))
             } else {
-                println("No cars with color ${color.uppercase()} were found.")
+                println("No cars with color $color were found.")
             }
         } else {
             println("Sorry, a parking lot has not been created.")
@@ -156,7 +138,7 @@ class CarParking() {
                 println(spotsFiltered.map { s -> s?.registrationNumber ?: "" }
                     .joinToString(prefix = "", postfix = "", separator = ", "))
             } else {
-                println("No cars with color ${color.uppercase()} were found.")
+                println("No cars with color $color were found.")
             }
         } else {
             println("Sorry, a parking lot has not been created.")

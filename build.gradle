@@ -17,7 +17,7 @@ subprojects {
 
     def userJava = Integer.parseInt(JavaVersion.current().getMajorVersion())
     def hsJava = Integer.parseInt(hs.kotlin.javaVersion)
-    def testJava = Math.max(userJava, hsJava)
+    def testJava = userJava
 
     java.toolchain.languageVersion = JavaLanguageVersion.of(testJava)
 
